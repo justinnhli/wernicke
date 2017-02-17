@@ -5,3 +5,5 @@ a = 1
 print(a)
 print(a)
 print(a)
+
+print (110 % 2)

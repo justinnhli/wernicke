@@ -70,6 +70,12 @@ class StochasticPyliteInterpreter(PyliteInterpreter):
             elif random == 1:
                 return name
         raise NameError('Undefined variable `{}`'.format(name))
+    def visit_Mod(self, node):
+        random = randrange(2)
+        if random == 0:
+            return operator.mod
+        if random == 1:
+            return operator.truediv
     @staticmethod
     def run(code):
         StochasticPyliteInterpreter().visit(parse(code))

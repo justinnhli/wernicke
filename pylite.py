@@ -102,7 +102,7 @@ class BindingInterpreter(PyliteInterpreter):
                 type(node.left.op).__name__ == 'Mult' and
                 type(node.left.left).__name__ == 'Num' and
                 type(node.left.right).__name__ == 'Num'):
-            print('first case mult')
+            print('first case mult/add')
             left_left = self.visit(node.left.left)
             left_right = self.visit(node.left.right)
             right = self.visit(node.right)
@@ -115,11 +115,37 @@ class BindingInterpreter(PyliteInterpreter):
                 type(node.right.op).__name__ == 'Mult' and
                 type(node.right.left).__name__ == 'Num' and
                 type(node.right.right).__name__ == 'Num'):
-            print('second case mult')
+            print('second case mult/add')
             left = self.visit(node.left)
             right_left = self.visit(node.right.left)
             right_right = self.visit(node.right.right)
             return (left + right_left) * right_right
+
+        # (2 * 3 - 4) = -2
+        if (type(node.op).__name__ == 'Sub' and
+                type(node.right).__name__ == 'Num' and
+                type(node.left).__name__ == 'BinOp' and
+                type(node.left.op).__name__ == 'Mult' and
+                type(node.left.left).__name__ == 'Num' and
+                type(node.left.right).__name__ == 'Num'):
+            print('first case mult/sub')
+            left_left = self.visit(node.left.left)
+            left_right = self.visit(node.left.right)
+            right = self.visit(node.right)
+            return left_left * (left_right - right)
+
+        # (2 - 3 * 4) = -4
+        if (type(node.op).__name__ == 'Sub' and
+                type(node.left).__name__ == 'Num' and
+                type(node.right).__name__ == 'BinOp' and
+                type(node.right.op).__name__ == 'Mult' and
+                type(node.right.left).__name__ == 'Num' and
+                type(node.right.right).__name__ == 'Num'):
+            print('second case mult/sub')
+            left = self.visit(node.left)
+            right_left = self.visit(node.right.left)
+            right_right = self.visit(node.right.right)
+            return (left - right_left) * right_right
 
 
         # (4 / 2 + 1)

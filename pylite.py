@@ -105,6 +105,7 @@ class BindingInterpreter(PyliteInterpreter):
             left_right = self.visit(node.left.right)
             right = self.visit(node.right)
             return left_left * (left_right + right)
+
         if (type(node.op).__name__ == 'Add' and
                 type(node.left).__name__ == 'Num' and
                 type(node.right).__name__ == 'BinOp' and
@@ -116,6 +117,20 @@ class BindingInterpreter(PyliteInterpreter):
             right_left = self.visit(node.right.left)
             right_right = self.visit(node.right.right)
             return (left + right_left) * right_right
+
+
+        # (4 / 2 + 1)
+        if(type(node.op).__name__ == 'Add' and
+           type(node.right).__name__ == 'Num' and
+           type(node.left).__name__ == 'BinOp' and
+           type(node.left.left).__name__ == 'Num' and
+           type(node.left.right).__name__ == 'Num'):
+           print('first case division')
+           left_left = self.visit(node.left.left)
+           right = self.visit(node.right)
+           left_right = self.visit(node.left.right)
+           return (left_left / (right + left_right))
+
         else:
             args = [self.visit(node.left), self.visit(node.right)]
             op = self.visit(node.op)

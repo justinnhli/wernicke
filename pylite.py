@@ -31,6 +31,27 @@ class PyliteInterpreter(NodeVisitor):
         raise NameError('Undefined variable `{}`'.format(name))
     def visit_Assign(self, node):
         self.env[node.targets[0].id] = self.visit(node.value)
+    def visit_Compare(self, node):
+        ops = [self.visit(op) for op in node.ops]
+        values = [self.visit(node.left)]
+        values.extend(self.visit(expr) for expr in node.comparators)
+        result = True
+        for i, (left, right) in enumerate(zip(values[:-1], values[1:])):
+            if not ops[i](left, right):
+                return False
+        return True
+    def visit_Lt(self, node):
+        return operator.lt
+    def visit_Le(self, node):
+        return operator.le
+    def visit_Eq(self, node):
+        return operator.eq
+    def visit_Ne(self, node):
+        return operator.ne
+    def visit_Ge(self, node):
+        return operator.ge
+    def visit_Gt(self, node):
+        return operator.gt
     def visit_BinOp(self, node):
         args = [self.visit(node.left), self.visit(node.right)]
         op = self.visit(node.op)

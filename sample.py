@@ -9,6 +9,10 @@ if 1 < 0 :
 else:
     print ('ok')
 
+if 0 < 1 < 2:
+    print('ok')
+else:
+    print('wrong')
 
 # print(2 * 3 + 4)
 # print(2 + 3 * 4)

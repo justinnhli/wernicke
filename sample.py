@@ -14,6 +14,11 @@ if 0 < 1 < 2:
 else:
     print('wrong')
 
+a = 0
+while a < 10:
+    print(a)
+    a += 1
+
 # print(2 * 3 + 4)
 # print(2 + 3 * 4)
 # print(2 * 3 - 4)

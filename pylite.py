@@ -84,6 +84,13 @@ class PyliteInterpreter(NodeVisitor):
         else:
             for else_statement in node.orelse:
                 self.visit(else_statement)
+    def visit_While(self, node):
+        test_result = self.visit(node.test)
+        while test_result:
+            for statement in node.body:
+                # FIXME this doesn't deal with breaks
+                self.visit(statement)
+            test_result = self.visit(node.test)
 
     @staticmethod
     def run(code):

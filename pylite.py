@@ -74,9 +74,9 @@ class PyliteInterpreter(NodeVisitor):
         return node.s
     def visit_Num(self, node):
         return node.n
-
     def visit_If(self, node):
-        if (node.test):
+        test_result = self.visit(node.test)
+        if test_result:
             for statement in node.body:
                 self.visit(statement)
         else:

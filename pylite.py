@@ -31,6 +31,8 @@ class PyliteInterpreter(NodeVisitor):
         raise NameError('Undefined variable `{}`'.format(name))
     def visit_Assign(self, node):
         self.env[node.targets[0].id] = self.visit(node.value)
+    def visit_AugAssign(self, node):
+        self.env[node.target.id] = self.visit(node.op)(self.visit(node.target), self.visit(node.value))
     def visit_Compare(self, node):
         ops = [self.visit(op) for op in node.ops]
         values = [self.visit(node.left)]
@@ -74,14 +76,21 @@ class PyliteInterpreter(NodeVisitor):
         return node.s
     def visit_Num(self, node):
         return node.n
-
     def visit_If(self, node):
-        if (node.test):
+        test_result = self.visit(node.test)
+        if test_result:
             for statement in node.body:
                 self.visit(statement)
         else:
             for else_statement in node.orelse:
                 self.visit(else_statement)
+    def visit_While(self, node):
+        test_result = self.visit(node.test)
+        while test_result:
+            for statement in node.body:
+                # FIXME this doesn't deal with breaks
+                self.visit(statement)
+            test_result = self.visit(node.test)
 
     @staticmethod
     def run(code):

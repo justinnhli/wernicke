@@ -53,6 +53,15 @@ class PyliteInterpreter(NodeVisitor):
         return node.s
     def visit_Num(self, node):
         return node.n
+
+    def visit_If(self, node):
+        if (node.test):
+            for statement in node.body:
+                self.visit(statement)
+        else:
+            for else_statement in node.orelse:
+                self.visit(else_statement)
+
     @staticmethod
     def run(code):
         PyliteInterpreter().visit(parse(code))
@@ -79,6 +88,7 @@ class StochasticPyliteInterpreter(PyliteInterpreter):
     @staticmethod
     def run(code):
         StochasticPyliteInterpreter().visit(parse(code))
+
 
 class BindingInterpreter(PyliteInterpreter):
     def __init__(self):

@@ -248,7 +248,7 @@ class BindingInterpreter(PyliteInterpreter):
 def main():
     arg_parser = ArgumentParser()
     arg_parser.add_argument('line_or_file')
-    arg_parser.add_argument('--interp', choices=('correct', 'stochastic', 'binding'))
+    arg_parser.add_argument('--interp', choices=('correct', 'stochastic', 'binding'), default='correct')
     args = arg_parser.parse_args()
     if file_exists(args.line_or_file):
         with open(args.line_or_file) as fd:

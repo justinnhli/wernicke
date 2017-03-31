@@ -35,12 +35,12 @@ class PyliteInterpreter(NodeVisitor):
         self.env[node.target.id] = self.visit(node.op)(self.visit(node.target), self.visit(node.value))
     def visit_Compare(self, node):
         ops = [self.visit(op) for op in node.ops]
-        values = [self.visit(node.left)]
-        values.extend(self.visit(expr) for expr in node.comparators)
-        result = True
-        for i, (left, right) in enumerate(zip(values[:-1], values[1:])):
-            if not ops[i](left, right):
+        prev_value = self.visit(node.left)
+        for i in range(len(ops)):
+            next_value = self.visit(node.comparators[i])
+            if not ops[i](prev_value, next_value):
                 return False
+            prev_value = next_value
         return True
     def visit_Lt(self, node):
         return operator.lt

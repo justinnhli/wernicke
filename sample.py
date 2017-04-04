@@ -1,23 +1,31 @@
 if 1 > 0 :
-    print ('yes')
-    print ('also this')
+    print ('case 1 correct')
 else:
-    print ('noooo')
+    print ('case 1 incorrect')
 
 if 1 < 0 :
-    print ('wrong')
+    print ('case 2 incorrect')
 else:
-    print ('ok')
+    print ('case 2 correct')
 
 if 0 < 1 < 2:
-    print('ok')
+    print('case 3 correct')
 else:
-    print('wrong')
+    print('case 3 incorrect')
 
-a = 0
-while a < 10:
-    print(a)
-    a += 1
+myBool = True
+
+if myBool:
+    print ('case 4 correct')
+    myBool = False
+else:
+    print ('case 4 incorrect')
+
+
+# a = 0
+# while a < 10:
+#     print(a)
+#     a += 1
 
 # print(2 * 3 + 4)
 # print(2 + 3 * 4)

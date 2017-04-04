@@ -76,6 +76,7 @@ class PyliteInterpreter(NodeVisitor):
         return node.s
     def visit_Num(self, node):
         return node.n
+
     def visit_If(self, node):
         test_result = self.visit(node.test)
         if test_result:
@@ -115,6 +116,37 @@ class StochasticPyliteInterpreter(PyliteInterpreter):
             return operator.mod
         if random == 1:
             return operator.truediv
+
+
+    def visit_If(self, node):
+        random = randrange(2)
+
+        # Correct interpretation
+        if random == 0:
+            print ("Correct interpretation")
+            test_result = self.visit(node.test)
+            if test_result:
+                for statement in node.body:
+                    self.visit(statement)
+            else:
+                for else_statement in node.orelse:
+                    self.visit(else_statement)
+
+        # first error: switch truth value of "if" and "else" conditions
+        # problem: doesn't account for why they were switched
+        # (can be handled according the specifics of the sample code file?)
+
+        elif random == 1:
+            print ("Incorrect interpretation")
+            test_result = self.visit(node.test)
+            if not test_result:
+                for statement in node.body:
+                    self.visit(statement)
+            else:
+                for else_statement in node.orelse:
+                    self.visit(else_statement)
+
+
     @staticmethod
     def run(code):
         StochasticPyliteInterpreter().visit(parse(code))

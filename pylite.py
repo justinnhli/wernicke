@@ -33,6 +33,21 @@ class PyliteInterpreter(NodeVisitor):
         self.env[node.targets[0].id] = self.visit(node.value)
     def visit_AugAssign(self, node):
         self.env[node.target.id] = self.visit(node.op)(self.visit(node.target), self.visit(node.value))
+    def visit_BoolOp(self, node):
+        if type(node.op).__name__ == 'And':
+            for value in node.values:
+                if not self.visit(value):
+                    return False
+            return True
+        elif type(node.op).__name__ == 'Or':
+            for value in node.values:
+                if self.visit(value):
+                    return True
+            return False
+        else:
+            raise NotImplementedError('Unknown boolean operator `{}`'.format(type(node.op).__name__))
+    def visit_NameConstant(self, node):
+        return node.value
     def visit_Compare(self, node):
         ops = [self.visit(op) for op in node.ops]
         prev_value = self.visit(node.left)
@@ -72,6 +87,16 @@ class PyliteInterpreter(NodeVisitor):
         return operator.mod
     def visit_Pow(self, node):
         return operator.pow
+    def visit_UnaryOp(self, node):
+        return self.visit(node.op)(self.visit(node.operand))
+    def visit_Not(self, node):
+        return operator.not_
+    def visit_UAdd(self, node):
+        return operator.pos
+    def visit_USub(self, node):
+        return operator.neg
+
+
     def visit_Str(self, node):
         return node.s
     def visit_Num(self, node):

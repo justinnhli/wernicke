@@ -33,14 +33,29 @@ class PyliteInterpreter(NodeVisitor):
         self.env[node.targets[0].id] = self.visit(node.value)
     def visit_AugAssign(self, node):
         self.env[node.target.id] = self.visit(node.op)(self.visit(node.target), self.visit(node.value))
+    def visit_BoolOp(self, node):
+        if type(node.op).__name__ == 'And':
+            for value in node.values:
+                if not self.visit(value):
+                    return False
+            return True
+        elif type(node.op).__name__ == 'Or':
+            for value in node.values:
+                if self.visit(value):
+                    return True
+            return False
+        else:
+            raise NotImplementedError('Unknown boolean operator `{}`'.format(type(node.op).__name__))
+    def visit_NameConstant(self, node):
+        return node.value
     def visit_Compare(self, node):
         ops = [self.visit(op) for op in node.ops]
-        values = [self.visit(node.left)]
-        values.extend(self.visit(expr) for expr in node.comparators)
-        result = True
-        for i, (left, right) in enumerate(zip(values[:-1], values[1:])):
-            if not ops[i](left, right):
+        prev_value = self.visit(node.left)
+        for i in range(len(ops)):
+            next_value = self.visit(node.comparators[i])
+            if not ops[i](prev_value, next_value):
                 return False
+            prev_value = next_value
         return True
     def visit_Lt(self, node):
         return operator.lt
@@ -72,6 +87,16 @@ class PyliteInterpreter(NodeVisitor):
         return operator.mod
     def visit_Pow(self, node):
         return operator.pow
+    def visit_UnaryOp(self, node):
+        return self.visit(node.op)(self.visit(node.operand))
+    def visit_Not(self, node):
+        return operator.not_
+    def visit_UAdd(self, node):
+        return operator.pos
+    def visit_USub(self, node):
+        return operator.neg
+
+
     def visit_Str(self, node):
         return node.s
     def visit_Num(self, node):
@@ -355,7 +380,7 @@ class BindingInterpreter(PyliteInterpreter):
 def main():
     arg_parser = ArgumentParser()
     arg_parser.add_argument('line_or_file')
-    arg_parser.add_argument('--interp', choices=('correct', 'stochastic', 'binding'))
+    arg_parser.add_argument('--interp', choices=('correct', 'stochastic', 'binding'), default='correct')
     args = arg_parser.parse_args()
     if file_exists(args.line_or_file):
         with open(args.line_or_file) as fd:

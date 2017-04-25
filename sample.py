@@ -1,31 +1,39 @@
-if 1 > 0 :
-    print ('case 1 correct')
+if False:
+    print ("false")
+elif True:
+    print ("true")
 else:
-    print ('case 1 incorrect')
+    print ("should not print")
 
-if 1 < 0 :
-    print ('case 2 incorrect')
-else:
-    print ('case 2 correct')
-
-if 0 < 1 < 2:
-    print('case 3 correct')
-else:
-    print('case 3 incorrect')
-
-myBool = True
-
-if myBool:
-    print ('case 4 correct')
-    myBool = False
-else:
-    print ('case 4 incorrect')
+#
+# if 1 > 0 :
+#     print ('case 1 correct')
+# else:
+#     print ('case 1 incorrect')
+#
+# if 1 < 0 :
+#     print ('case 2 incorrect')
+# else:
+#     print ('case 2 correct')
+#
+# if 0 < 1 < 2:
+#     print('case 3 correct')
+# else:
+#     print('case 3 incorrect')
+#
+# myBool = True
+#
+# if myBool:
+#     print ('case 4 correct')
+#     myBool = False
+# else:
+#     print ('case 4 incorrect')
 
 
 # a = 0
 # while a < 10:
-#     print(a)
-#     a += 1
+#      print(a)
+#      a += 1
 
 # print(2 * 3 + 4)
 # print(2 + 3 * 4)

@@ -110,6 +110,8 @@ class StochasticPyliteInterpreter(PyliteInterpreter):
             elif random == 1:
                 return name
         raise NameError('Undefined variable `{}`'.format(name))
+
+
     def visit_Mod(self, node):
         random = randrange(2)
         if random == 0:
@@ -119,32 +121,105 @@ class StochasticPyliteInterpreter(PyliteInterpreter):
 
 
     def visit_If(self, node):
-        random = randrange(2)
+        random = randrange(4)
 
-        # Correct interpretation
-        if random == 0:
-            print ("Correct interpretation")
+        # handle elif/else statement error: evaluating both the if and elif
+        if type(node.orelse[0]).__name__ == "If":
+            # first evaluate the if statement
             test_result = self.visit(node.test)
             if test_result:
                 for statement in node.body:
                     self.visit(statement)
-            else:
-                for else_statement in node.orelse:
-                    self.visit(else_statement)
 
-        # first error: switch truth value of "if" and "else" conditions
-        # problem: doesn't account for why they were switched
-        # (can be handled according the specifics of the sample code file?)
+            # then visit the elif statement and also evaluate that
+            for statement in node.orelse:
+                self.visit(statement)
 
-        elif random == 1:
-            print ("Incorrect interpretation")
-            test_result = self.visit(node.test)
-            if not test_result:
+        else:
+            # Correct interpretation
+            if random == 0:
+                test_result = self.visit(node.test)
+                if test_result:
+                    for statement in node.body:
+                        self.visit(statement)
+                else:
+                    for else_statement in node.orelse:
+                        self.visit(else_statement)
+
+            # incorrect interpretations
+            elif random == 1:
+                test_result = self.visit(node.test)
+                if not test_result:
+                    for statement in node.body:
+                        self.visit(statement)
+                else:
+                    for else_statement in node.orelse:
+                        self.visit(else_statement)
+
+            elif random == 2:
                 for statement in node.body:
                     self.visit(statement)
-            else:
                 for else_statement in node.orelse:
                     self.visit(else_statement)
+
+            elif random == 3:
+                pass
+
+
+
+
+
+    def visit_While(self, node):
+        test_result = self.visit(node.test)
+        while test_result:
+            for statement in node.body:
+                # FIXME this doesn't deal with breaks
+                self.visit(statement)
+            test_result = self.visit(node.test)
+
+
+    def visit_Compare(self, node):
+        ops = [self.visit(op) for op in node.ops]
+        values = [self.visit(node.left)]
+        values.extend(self.visit(expr) for expr in node.comparators)
+        result = True
+        for i, (left, right) in enumerate(zip(values[:-1], values[1:])):
+            if not ops[i](left, right):
+                return False
+        return True
+    def visit_Lt(self, node):
+        return operator.lt
+    def visit_Le(self, node):
+        return operator.le
+    def visit_Eq(self, node):
+        return operator.eq
+    def visit_Ne(self, node):
+        return operator.ne
+    def visit_Ge(self, node):
+        return operator.ge
+    def visit_Gt(self, node):
+        return operator.gt
+    def visit_BinOp(self, node):
+        args = [self.visit(node.left), self.visit(node.right)]
+        op = self.visit(node.op)
+        return op(*args)
+    def visit_Add(self, node):
+        return operator.add
+    def visit_Sub(self, node):
+        return operator.sub
+    def visit_Mult(self, node):
+        return operator.mul
+    def visit_Div(self, node):
+        return operator.truediv
+    def visit_FloorDiv(self, node):
+        return operator.floordiv
+    def visit_Pow(self, node):
+        return operator.pow
+    def visit_Str(self, node):
+        return node.s
+    def visit_Num(self, node):
+        return node.n
+
 
 
     @staticmethod

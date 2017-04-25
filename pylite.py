@@ -190,10 +190,6 @@ class StochasticPyliteInterpreter(PyliteInterpreter):
             elif random == 3:
                 pass
 
-
-
-
-
     def visit_While(self, node):
         test_result = self.visit(node.test)
         while test_result:

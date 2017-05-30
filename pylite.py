@@ -173,6 +173,7 @@ class StochasticPyliteInterpreter(PyliteInterpreter):
 
             # incorrect interpretations
             elif random == 1:
+                # accidental negates the test
                 test_result = self.visit(node.test)
                 if not test_result:
                     for statement in node.body:
@@ -182,12 +183,14 @@ class StochasticPyliteInterpreter(PyliteInterpreter):
                         self.visit(else_statement)
 
             elif random == 2:
+                # runs both if and else
                 for statement in node.body:
                     self.visit(statement)
                 for else_statement in node.orelse:
                     self.visit(else_statement)
 
             elif random == 3:
+                # runs neither
                 pass
 
     def visit_While(self, node):
